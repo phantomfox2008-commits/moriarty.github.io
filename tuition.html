@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tuition Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --container-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        body.dark-mode {
+            --bg-color: #0f172a;
+            --container-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --input-bg: #0f172a;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px 10px;
+            margin: 0;
+            transition: all 0.3s ease;
+        }
+
+        .container { max-width: 1200px; margin: auto; }
+
+        h2, h3 { font-weight: 600; margin: 0; }
+        
+        /* SVG Icons များကို ဖုန်းတွင် အချိုးကျစေရန် ပြင်ဆင်ထားသည် */
+        svg { width: 18px; height: 18px; stroke-width: 1.5; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--container-bg); padding: 16px 24px;
+            border-radius: 12px; border: 1px solid var(--border-color);
+            margin-bottom: 24px; flex-wrap: wrap; gap: 15px;
+        }
+
+        .app-title { font-size: 20px; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        button, .btn-label {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 14px; border-radius: 8px; cursor: pointer;
+            border: 1px solid var(--border-color); font-weight: 500;
+            font-family: inherit; font-size: 13px; background: var(--container-bg);
+            color: var(--text-main); transition: all 0.2s;
+        }
+        button:hover, .btn-label:hover { background: var(--input-bg); border-color: var(--text-muted); }
+
+        .btn-primary { background: var(--primary); color: white; border: none; }
+        .btn-primary:hover { background: var(--primary-hover); }
+
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .card { 
+            background: var(--container-bg); padding: 20px; border-radius: 12px;
+            border: 1px solid var(--border-color); display: flex; flex-direction: column;
+        }
+        .card-title { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;}
+        .card-value { font-size: 26px; font-weight: 700; color: var(--text-main); margin-top: 8px; }
+
+        .content-area { background: var(--container-bg); padding: 24px; border-radius: 12px; border: 1px solid var(--border-color); }
+        
+        .controls-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+        
+        .search-box { flex: 1; min-width: 260px; position: relative; }
+        .search-box svg { position: absolute; left: 12px; top: 10px; color: var(--text-muted); width: 16px; height: 16px; }
+        .search-box input {
+            width: 100%; padding: 9px 12px 9px 36px; border-radius: 8px;
+            border: 1px solid var(--border-color); background: var(--input-bg);
+            color: var(--text-main); font-family: inherit; font-size: 13px; box-sizing: border-box;
+        }
+        .search-box input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1); }
+
+        .tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+        .tab-btn { background: transparent; color: var(--text-muted); border: none; padding: 6px 12px; border-radius: 6px; }
+        .tab-btn.active { background: var(--input-bg); color: var(--text-main); font-weight: 600; border: 1px solid var(--border-color); }
+
+        .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; text-align: left; }
+        th, td { padding: 12px 16px; border-bottom: 1px solid var(--border-color); font-size: 13px; white-space: nowrap; vertical-align: middle; }
+        th { color: var(--text-muted); font-weight: 600; background: var(--input-bg); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: var(--input-bg); }
+
+        .status-paid { color: var(--success); font-weight: 500; }
+        .status-pending { color: var(--danger); font-weight: 500; }
+        
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-muted);}
+
+        .action-btns { display: flex; gap: 6px; }
+        .icon-btn { padding: 6px; border-radius: 6px; background: transparent; border: 1px solid transparent; color: var(--text-muted); }
+        .icon-btn:hover { background: var(--input-bg); border-color: var(--border-color); color: var(--text-main); }
+        .icon-btn.danger:hover { color: var(--danger); border-color: var(--danger); background: rgba(239, 68, 68, 0.05); }
+
+        .modal { display: none; position: fixed; z-index: 2000; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); align-items: center; justify-content: center;}
+        .modal-content { 
+            background: var(--container-bg); color: var(--text-main); 
+            padding: 24px; border-radius: 12px; width: 90%; max-width: 450px; 
+            max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { font-size: 16px; }
+        .close-btn { border: none; padding: 4px; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 12px; margin-bottom: 6px; font-weight: 500; color: var(--text-muted); }
+        .form-group input, .form-group select { 
+            width: 100%; padding: 10px 12px; border-radius: 8px; 
+            border: 1px solid var(--border-color); background: var(--input-bg); 
+            color: var(--text-main); box-sizing: border-box; font-family: inherit; font-size: 13px;
+        }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
+        .btn-block { width: 100%; justify-content: center; padding: 12px; font-size: 14px; margin-top: 8px;}
+
+        .receipt-row { display: flex; justify-content: space-between; margin: 10px 0; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px; font-size: 13px;}
+
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); display: none; }
+        .empty-state svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state h3 { color: var(--text-main); margin-bottom: 8px; }
+
+        #toast {
+            visibility: hidden; background: var(--text-main); color: var(--container-bg);
+            border-radius: 8px; padding: 12px 24px; position: fixed; z-index: 3000; 
+            left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 13px; font-weight: 500;
+        }
+        #toast.show { visibility: visible; animation: fadein 0.3s, fadeout 0.3s 2.5s; }
+
+        @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+        @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 20px; border: none; box-shadow: none; color: black !important; background: white !important;}
+            .no-print { display: none !important; }
+            .modal { background: transparent; backdrop-filter: none; display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="top-bar">
+        <h2 class="app-title">
+            <svg viewBox="0 0 24 24"><path d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"/></svg>
+            Tuition
+        </h2>
+        <div class="header-actions">
+            <button id="themeToggle" title="Toggle Theme">
+                <svg id="themeIcon" viewBox="0 0 24 24"><path d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
+            </button>
+            <button onclick="openRecycleBin()" title="Recycle Bin">
+                <svg viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                Bin
+            </button>
+            <label class="btn-label" title="Import CSV">
+                <svg viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                Import
+                <input type="file" id="csvImport" accept=".csv" style="display:none" onchange="importCSV(event)">
+            </label>
+            <button onclick="exportToCSV()" title="Export CSV">
+                <svg viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                Export
+            </button>
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <div class="card">
+            <div class="card-title">Total Students</div>
+            <div class="card-value" id="totalStudents">0</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Collected (MMK)</div>
+            <div class="card-value" id="totalPaid" style="color: var(--success);">0</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Pending (MMK)</div>
+            <div class="card-value" id="totalBalance" style="color: var(--danger);">0</div>
+        </div>
+    </div>
+
+    <div class="content-area">
+        
+        <div class="controls-row">
+            <div class="tabs" id="tabContainer">
+                <button class="tab-btn active" onclick="filterStudents('All')">All</button>
+                <button class="tab-btn" onclick="filterStudents('First Year')">First Yr</button>
+                <button class="tab-btn" onclick="filterStudents('Second Year')">Second Yr</button>
+                <button class="tab-btn" onclick="filterStudents('Third Year')">Third Yr</button>
+                <button class="tab-btn" onclick="filterStudents('Fourth Year')">Fourth Yr</button>
+            </div>
+            
+            <div class="search-box">
+                <svg viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                <input type="text" id="searchInput" placeholder="Search name or phone..." oninput="displayStudents()">
+            </div>
+
+            <button class="btn-primary" onclick="openFormModal()">
+                <svg viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                Add Student
+            </button>
+        </div>
+
+        <div id="emptyState" class="empty-state">
+            <svg viewBox="0 0 24 24"><path d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/></svg>
+            <h3>No Records Found</h3>
+            <p style="font-size: 13px;">Click 'Add Student' to create a new entry.</p>
+        </div>
+
+        <div class="table-responsive" id="tableContainer">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Class</th>
+                        <th>Type</th>
+                        <th>Phone</th>
+                        <th>Total Fee</th>
+                        <th>Paid</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="studentList"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<div id="formModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="formTitle">Add New Student</h3>
+            <button class="close-btn" onclick="closeModal('formModal')">
+                <svg viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <form id="tuitionForm">
+            <div class="form-group">
+                <label>Student Name</label>
+                <input type="text" id="studentName" placeholder="Enter full name" required>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Type</label>
+                    <select id="studentType" required>
+                        <option value="old">Old (180,000)</option>
+                        <option value="new">New (200,000)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Class/Year</label>
+                    <select id="studentYear" required>
+                        <option value="First Year">First Year</option>
+                        <option value="Second Year">Second Year</option>
+                        <option value="Third Year">Third Year</option>
+                        <option value="Fourth Year">Fourth Year</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="phoneNumber" placeholder="09..." required>
+            </div>
+            <div class="form-group">
+                <label>Amount Paid (MMK)</label>
+                <input type="number" id="amountPaid" placeholder="e.g. 100000" required>
+            </div>
+            <div class="form-group">
+                <label>Remarks (Optional)</label>
+                <input type="text" id="remark" placeholder="Any additional notes...">
+            </div>
+            <button type="submit" id="submitBtn" class="btn-primary btn-block">Save Record</button>
+        </form>
+    </div>
+</div>
+
+<div id="receiptModal" class="modal">
+    <div class="modal-content" id="printArea" style="max-width: 320px;">
+        <div class="modal-header no-print" style="margin-bottom: 10px;">
+            <h3>Official Receipt</h3>
+            <button class="close-btn" onclick="closeModal('receiptModal')">
+                <svg viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="margin:0; font-size: 20px;">Tuition Receipt</h2>
+            <p id="rDate" style="color: var(--text-muted); font-size: 12px; margin-top: 4px;"></p>
+        </div>
+        <div class="receipt-row"><span>Name</span> <b id="rName"></b></div>
+        <div class="receipt-row"><span>Class</span> <b id="rYear"></b></div>
+        <div class="receipt-row"><span>Type</span> <b id="rType"></b></div>
+        <div class="receipt-row"><span>Total Fee</span> <b id="rTotalFee"></b></div>
+        <div class="receipt-row"><span>Paid</span> <b id="rPaid" class="status-paid"></b></div>
+        <div class="receipt-row"><span>Balance</span> <b id="rBalance" class="status-pending"></b></div>
+        <p style="margin-top:20px; font-size:11px; color:var(--text-muted); text-align:center;">-- Thank You --</p>
+        
+        <button class="btn-primary btn-block no-print" onclick="window.print()" style="margin-top: 15px;">
+            <svg viewBox="0 0 24 24"><path d="M6.728 12.5H17.27m-10.542 0A1.5 1.5 0 005.228 14v4.5A1.5 1.5 0 006.728 20h10.543a1.5 1.5 0 001.5-1.5V14a1.5 1.5 0 00-1.5-1.5H6.728zM6.728 12.5V5.5A1.5 1.5 0 018.228 4h7.543a1.5 1.5 0 011.5 1.5v7m-11.5 0H4a2 2 0 00-2 2v3a2 2 0 002 2h1.228"/></svg>
+            Print Receipt
+        </button>
+    </div>
+</div>
+
+<div id="recycleModal" class="modal">
+    <div class="modal-content" style="max-width: 550px;">
+        <div class="modal-header">
+            <h3>Recycle Bin</h3>
+            <button class="close-btn" onclick="closeModal('recycleModal')">
+                <svg viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table style="min-width: 100%;">
+                <thead>
+                    <tr>
+                        <th>No.</th><th>Name</th><th>Class</th><th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recycleList"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let students = JSON.parse(localStorage.getItem('studentsData')) || [];
+    let deletedStudents = JSON.parse(localStorage.getItem('deletedStudentsData')) || []; 
+    let currentFilter = 'All'; 
+    let editingId = null;
+
+    const form = document.getElementById('tuitionForm');
+    const studentList = document.getElementById('studentList');
+    const recycleList = document.getElementById('recycleList');
+    const searchInput = document.getElementById('searchInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const toast = document.getElementById('toast');
+    
+    const emptyState = document.getElementById('emptyState');
+    const tableContainer = document.getElementById('tableContainer');
+    const formModal = document.getElementById('formModal');
+    const formTitle = document.getElementById('formTitle');
+
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    
+    const moonIcon = '<path d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>';
+    const sunIcon = '<path d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>';
+
+    if (localStorage.getItem('theme') === 'dark') { 
+        document.body.classList.add('dark-mode'); 
+        themeIcon.innerHTML = sunIcon; 
+    }
+    
+    themeToggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        themeIcon.innerHTML = isDark ? sunIcon : moonIcon;
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+
+    function showToast(msg) {
+        toast.innerText = msg; toast.className = "show";
+        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+    }
+
+    function openFormModal() {
+        form.reset();
+        editingId = null;
+        formTitle.innerText = "Add New Student";
+        submitBtn.innerText = "Save Record";
+        formModal.style.display = "flex";
+    }
+
+    function closeModal(modalId) { document.getElementById(modalId).style.display = "none"; }
+
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal')) event.target.style.display = "none";
+    }
+
+    displayStudents();
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('studentName').value;
+        const type = document.getElementById('studentType').value; 
+        const year = document.getElementById('studentYear').value;
+        const phone = document.getElementById('phoneNumber').value;
+        const paid = parseInt(document.getElementById('amountPaid').value);
+        const remark = document.getElementById('remark').value;
+        const date = new Date().toLocaleDateString('en-GB'); 
+
+        const requiredFee = (type === 'old') ? 180000 : 200000;
+        let balance = requiredFee - paid;
+        if (balance < 0) balance = 0;
+        let status = (paid >= requiredFee) ? 'Paid' : 'Pending';
+
+        if (editingId) {
+            const index = students.findIndex(s => s.id === editingId);
+            students[index] = { ...students[index], name, type, year, phone, requiredFee, paid, balance, status, remark };
+            showToast("Record updated successfully.");
+        } else {
+            students.push({ id: Date.now(), date, name, type, year, phone, requiredFee, paid, balance, status, remark });
+            showToast("Record saved successfully.");
+        }
+
+        localStorage.setItem('studentsData', JSON.stringify(students));
+        displayStudents();
+        closeModal('formModal');
+    });
+
+    function displayStudents() {
+        studentList.innerHTML = '';
+        const search = searchInput.value.toLowerCase();
+        let filtered = currentFilter === 'All' ? students : students.filter(s => s.year === currentFilter);
+        if (search) filtered = filtered.filter(s => s.name.toLowerCase().includes(search) || s.phone.includes(search));
+
+        if (filtered.length === 0) {
+            emptyState.style.display = "block";
+            tableContainer.style.display = "none";
+        } else {
+            emptyState.style.display = "none";
+            tableContainer.style.display = "block";
+        }
+
+        // --- English A to Z Sorting ---
+        filtered.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en'));
+
+        let tPaid = 0, tBal = 0, sn = 1; 
+
+        filtered.forEach(s => {
+            tPaid += s.paid; tBal += s.balance;
+            
+            const stType = s.type === 'new' ? 'New' : 'Old';
+            const badgeClass = s.type === 'new' ? 'badge-new' : 'badge-old';
+            const reqFee = s.requiredFee ? s.requiredFee : 180000; 
+            const displayStatus = (s.status === 'ပြည့်ပြီ' || s.status === 'Paid') ? 'Paid' : 'Pending';
+            const statusClass = displayStatus === 'Paid' ? 'status-paid' : 'status-pending';
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight:500; color:var(--text-muted);">${sn++}</td>
+                <td>${s.date || '-'}</td>
+                <td style="font-weight: 500;">${s.name}</td>
+                <td>${s.year}</td>
+                <td><span class="badge ${badgeClass}">${stType}</span></td>
+                <td>${s.phone}</td>
+                <td>${reqFee.toLocaleString()}</td>
+                <td>${s.paid.toLocaleString()}</td>
+                <td>${s.balance.toLocaleString()}</td>
+                <td class="${statusClass}">${displayStatus}</td>
+                <td style="color: var(--text-muted); font-size: 12px;">${s.remark || '-'}</td> 
+                <td style="text-align:right;">
+                    <div class="action-btns" style="justify-content: flex-end;">
+                        <button class="icon-btn" onclick="openReceipt(${s.id})" title="Receipt">
+                            <svg viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                        </button>
+                        <button class="icon-btn" onclick="editStudent(${s.id})" title="Edit">
+                            <svg viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"/></svg>
+                        </button>
+                        <button class="icon-btn danger" onclick="deleteStudent(${s.id})" title="Delete">
+                            <svg viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                        </button>
+                    </div>
+                </td>
+            `;
+            studentList.appendChild(tr);
+        });
+        
+        document.getElementById('totalStudents').innerText = filtered.length;
+        document.getElementById('totalPaid').innerText = tPaid.toLocaleString();
+        document.getElementById('totalBalance').innerText = tBal.toLocaleString();
+    }
+
+    function editStudent(id) {
+        const s = students.find(x => x.id === id);
+        document.getElementById('studentName').value = s.name;
+        document.getElementById('studentType').value = s.type || 'old'; 
+        document.getElementById('studentYear').value = s.year;
+        document.getElementById('phoneNumber').value = s.phone;
+        document.getElementById('amountPaid').value = s.paid;
+        document.getElementById('remark').value = s.remark || '';
+        
+        editingId = id;
+        formTitle.innerText = "Edit Record";
+        submitBtn.innerText = "Update Record";
+        formModal.style.display = "flex";
+    }
+
+    function deleteStudent(id) {
+        if(confirm("Move this record to Recycle Bin?")) {
+            const index = students.findIndex(s => s.id === id);
+            deletedStudents.push(students[index]);
+            students.splice(index, 1);
+            localStorage.setItem('studentsData', JSON.stringify(students));
+            localStorage.setItem('deletedStudentsData', JSON.stringify(deletedStudents));
+            displayStudents();
+            showToast("Moved to Recycle Bin.");
+        }
+    }
+
+    function openRecycleBin() {
+        renderRecycleBin();
+        document.getElementById('recycleModal').style.display = "flex";
+    }
+
+    function renderRecycleBin() {
+        recycleList.innerHTML = '';
+        if(deletedStudents.length === 0) {
+            recycleList.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 30px; color: var(--text-muted);">Bin is empty</td></tr>`;
+            return;
+        }
+        let sn = 1;
+        deletedStudents.forEach(s => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${sn++}</td>
+                <td style="font-weight: 500;">${s.name}</td>
+                <td>${s.year}</td>
+                <td style="text-align:right;">
+                    <div class="action-btns" style="justify-content: flex-end;">
+                        <button class="icon-btn" onclick="restoreStudent(${s.id})" title="Restore">
+                            <svg viewBox="0 0 24 24"><path d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+                        </button>
+                        <button class="icon-btn danger" onclick="hardDeleteStudent(${s.id})" title="Delete Permanently">
+                            <svg viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                </td>
+            `;
+            recycleList.appendChild(tr);
+        });
+    }
+
+    function restoreStudent(id) {
+        const index = deletedStudents.findIndex(s => s.id === id);
+        students.push(deletedStudents[index]);
+        deletedStudents.splice(index, 1);
+        localStorage.setItem('studentsData', JSON.stringify(students));
+        localStorage.setItem('deletedStudentsData', JSON.stringify(deletedStudents));
+        displayStudents();
+        renderRecycleBin();
+        showToast("Record restored.");
+    }
+
+    function hardDeleteStudent(id) {
+        if(confirm("Delete permanently? This action cannot be undone.")) {
+            deletedStudents = deletedStudents.filter(s => s.id !== id);
+            localStorage.setItem('deletedStudentsData', JSON.stringify(deletedStudents));
+            renderRecycleBin();
+            showToast("Record deleted permanently.");
+        }
+    }
+
+    function filterStudents(year) {
+        currentFilter = year;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.innerText.includes(year.split(' ')[0]) || (year==='All' && b.innerText==='All')));
+        displayStudents();
+    }
+
+    function exportToCSV() {
+        let csv = "No.,Date,Name,Type,Class,Phone,Total Fee,Paid,Balance,Status,Remarks\n";
+        
+        // Export လုပ်ရာတွင်လည်း A-Z အတိုင်း ထုတ်ပေးမည်
+        let exportData = [...students].sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en'));
+        
+        let sn = 1;
+        exportData.forEach(s => { 
+            const sType = s.type === 'new' ? 'New' : 'Old';
+            const rFee = s.requiredFee || 180000;
+            const displayStatus = (s.status === 'ပြည့်ပြီ' || s.status === 'Paid') ? 'Paid' : 'Pending';
+            csv += `${sn++},${s.date},${s.name},${sType},${s.year},${s.phone},${rFee},${s.paid},${s.balance},${displayStatus},${s.remark || ''}\n`; 
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob);
+        link.download = "Tuition_Data_Export.csv"; link.click();
+    }
+
+    function importCSV(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const rows = e.target.result.split('\n').slice(1);
+            rows.forEach(row => {
+                const cols = row.split(',');
+                if(cols.length >= 11) { 
+                    students.push({
+                        id: Date.now() + Math.random(),
+                        date: cols[1], name: cols[2], type: cols[3].toLowerCase() === 'new' ? 'new' : 'old',
+                        year: cols[4], phone: cols[5], requiredFee: parseInt(cols[6]),
+                        paid: parseInt(cols[7]), balance: parseInt(cols[8]), status: cols[9], remark: cols[10] || ''
+                    });
+                }
+            });
+            localStorage.setItem('studentsData', JSON.stringify(students));
+            displayStudents();
+            showToast("Data imported successfully.");
+        };
+        reader.readAsText(file);
+    }
+
+    function openReceipt(id) {
+        const s = students.find(x => x.id === id);
+        document.getElementById('rDate').innerText = "Date: " + (s.date || '-');
+        document.getElementById('rName').innerText = s.name;
+        document.getElementById('rYear').innerText = s.year;
+        document.getElementById('rType').innerText = s.type === 'new' ? 'New Student' : 'Old Student'; 
+        document.getElementById('rTotalFee').innerText = (s.requiredFee || 180000).toLocaleString(); 
+        document.getElementById('rPaid').innerText = s.paid.toLocaleString();
+        document.getElementById('rBalance').innerText = s.balance.toLocaleString();
+        document.getElementById('receiptModal').style.display = "flex";
+    }
+</script>
+
+</body>
+</html>
