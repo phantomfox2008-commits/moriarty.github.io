@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <title>The Daily Grind</title>
+
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+
+      <style>
+         :root {
+            --deep-cream: rgb(255, 244, 229);
+            --bg-cream: rgb(255, 251, 243);
+            --text-dark: rgb(51, 51, 51);
+            --accent-brown: rgb(101, 67, 33);
+            --gold: rgb(192, 150, 77);
+         }
+         *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+         }
+         body{
+            font-family: 'Mona Sans', sans-serif;
+            background-color: var(--bg-cream);
+            line-height: 1.6;
+            color: var(--text-dark);
+         }
+         header{
+            background-color: var(--bg-cream);
+            padding: 20px 10%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+         }
+         nav{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+         }
+         .logo{
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--gold);
+            text-align: center;
+         }
+         .links{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+         }
+         .links a{
+            margin-left: 20px;
+            margin-right: 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+         }
+         .links a:hover{
+            color: var(--accent-brown);
+         }
+         .hero{
+            position: relative;
+            height: 80vh;
+            min-height: 500px;
+            background-image: linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin-bottom: 50px;
+         }
+         .hero-content{
+            position: absolute;
+            top: 50%;
+            left: 30%;
+            transform: translate(-50%, -50%);
+            text-align: start;
+            width: 100%;
+            max-width: 600px;
+            padding: 0 20px;
+         }
+         .hero-content h1{
+            font-size: 3rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+            font-weight: 900;
+            line-height: 1.2;
+         }
+         .hero-content p{
+            font-size: 1.5rem;
+            color: var(--deep-cream);
+            margin-bottom: 40px;
+            font-weight: 600;
+         }
+         .view-btn{
+            padding:15px 40px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 30px;
+            border: none;
+            background-color: var(--accent-brown);
+            color: var(--gold);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+         }
+         .view-btn:active{
+            transform: scale(0.95);
+            box-shadow: none;
+            opacity: 0.9;
+         }
+         .menu h2{
+            color: var(--text-dark);
+            font-size: 2.5rem;
+            text-align: center;
+            font-weight: 900;
+            margin-bottom: 20px;
+         }
+         .menu-txt{
+            color: var(--gold);
+         }
+         .items{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 0 10%;
+            margin-bottom: 60px;
+         }
+         .items div {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 20px;
+            border: none;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            height: 100%;
+         }
+         .items img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+         }
+         .items h3{
+            color: var(--text-dark);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+         }
+         .items p{
+            color: var(--text-dark);
+            font-size: 1rem;
+            font-weight: 400;
+            margin-bottom: 15px;
+            flex-grow: 1;
+         }
+         .price{
+            color: var(--accent-brown);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+         }
+         .order-btn{
+            width: 100%;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 30px;
+            border: none;
+            background-color: var(--accent-brown);
+            color: var(--gold);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+         }
+         .order-btn:hover {
+            opacity: 0.9;
+         }
+         .about {
+            padding: 50px 10%;
+            text-align: center;
+            background-color: var(--deep-cream);
+         }
+         .about h2 {
+            font-size: 2.5rem;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            font-weight: 900;
+         }
+         .about p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto 30px;
+         }
+         .about-btn {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            background-color: var(--accent-brown);
+            color: var(--gold);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+         }
+         footer {
+            background-color: var(--text-dark);
+            color: var(--deep-cream);
+            padding: 50px 10%;
+            text-align: center;
+         }
+         footer h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 900;
+         }
+         footer img {
+            width: 100%;
+            max-width: 600px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin: 20px 0;
+         }
+         footer p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+         }
+
+         /* Responsive Media Queries */
+         @media (max-width: 768px) {
+            header {
+               padding: 15px 5%;
+            }
+            nav {
+               flex-direction: column;
+               gap: 15px;
+            }
+            .links a {
+               margin: 5px 10px;
+               font-size: 1rem;
+            }
+            .hero-content {
+               left: 50%;
+               text-align: center;
+            }
+            .hero-content h1 {
+               font-size: 2.2rem;
+            }
+            .hero-content p {
+               font-size: 1.2rem;
+            }
+            .menu h2, .about h2, footer h2 {
+               font-size: 2rem;
+            }
+            .items {
+               grid-template-columns: 1fr;
+               padding: 0 5%;
+            }
+         }
+      </style>
+   </head>
+
+   <body>
+      
+      <header>
+         <div class="container">
+            <nav>
+               <div class="logo">THE DAILY GRIND</div>
+               <div class="links">
+                  <a href="#Menu">Menu</a>
+                  <a href="#About">About Us</a>
+                  <a href="#Contact">Contact</a>
+               </div>
+            </nav>
+         </div>
+      </header>
+
+      <section class="hero">
+         <div class="hero-content">
+            <h1>CRAFTED COFFEE,
+               <br>
+               COZY MOMENTS
+            </h1>
+            <p>
+               Experience the perfect brew in <br>a space designed for comfort.
+            </p>
+            <button class="view-btn">
+               VIEW MENU
+            </button>
+         </div>
+      </section>
+
+      <section class="menu" id="Menu">
+         <h2>
+            MENU <span class="menu-txt">HIGHLIGHTS</span>
+         </h2>
+         <div class="items">
+            <div>
+               <img src="https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60" alt="Espresso">
+               <h3>Espresso</h3>
+               <p>A powerful, concentrated shot of our signature blend.</p>
+               <span class="price">$1.50</span>
+               <button class="order-btn">Explore</button>
+            </div>
+
+            <div>
+               <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60" alt="Signature Latte">
+               <h3>Signature Latte</h3>
+               <p>A smooth blend of our espresso and steamed milk.</p>
+               <span class="price">$2.00</span>
+               <button class="order-btn">Explore</button>
+            </div>
+
+            <div>
+               <img src="https://images.unsplash.com/photo-1557006021-b85faa2bc5e2?auto=format&fit=crop&w=800&q=60" alt="Classic Cappuccino">
+               <h3>Classic Cappuccino</h3>
+               <p>Equally balanced with espresso, steamed milk, and froth for a velvety finish.</p>
+               <span class="price">$2.50</span>
+               <button class="order-btn">Explore</button>
+            </div>
+
+            <div>
+               <img src="https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?auto=format&fit=crop&w=800&q=60" alt="Fudge Brownie">
+               <h3>Fudge Brownie</h3>
+               <p>Rich, decadent chocolate brownie with a gooey center.</p>
+               <span class="price">$2.20</span>
+               <button class="order-btn">Explore</button>
+            </div>
+
+            <div>
+               <img src="https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=800&q=60" alt="Vanilla Mini Cake">
+               <h3>Vanilla Mini Cake</h3>
+               <p>A delicate, portioned layer cake perfect for a sweet bite.</p>
+               <span class="price">$2.80</span>
+               <button class="order-btn">Explore</button>
+            </div>
+
+            <div>
+               <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60" alt="Almond Croissant">
+               <h3>Almond Croissant</h3>
+               <p>Our best-selling flaky croissant with sweet almond cream filling.</p>
+               <span class="price">$1.50</span>
+               <button class="order-btn">Explore</button>
+            </div>
+
+            <div>
+               <img src="https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?auto=format&fit=crop&w=800&q=60" alt="Signature Chocolate">
+               <h3>Signature Chocolate</h3>
+               <p>A rich, indulgent treat made with our signature chocolate blend.</p>
+               <span class="price">$2.00</span>
+               <button class="order-btn">Explore</button>
+            </div>
+
+            <div>
+               <img src="https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60" alt="Hot Tea">
+               <h3>Hot Tea</h3>
+               <p>A selection of premium teas, served hot for a soothing experience.</p>
+               <span class="price">$1.80</span>
+               <button class="order-btn">Explore</button>
+            </div>
+         </div>
+      </section>
+
+      <section class="about" id="About">
+         <h2>
+            OUR STORY
+         </h2>
+         <p>
+            The Daily Grind was born from a passion for exceptional coffee and a desire to create a welcoming space for our community. We source our beans from sustainable farms around the world, ensuring that every cup we serve is not only delicious but also ethically produced. Our baristas are trained to craft each drink with care, making every visit to The Daily Grind a memorable experience. Whether you're here for your morning pick-me-up or an afternoon treat, we invite you to savor the moment with us.
+         </p>
+
+         <button class="about-btn">
+            About Us
+         </button>
+      </section>
+
+      <footer id="Contact">
+         <h2>
+            FIND US
+         </h2>
+         <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=60" alt="Coffee Shop Interior">
+         <p>
+            <strong>THE DAILY GRIND</strong> 
+            <span>122 Main Street, London</span>
+            <span>MON-FRI: 7am-8pm, SAT-SUN: 8am-6pm</span>
+         </p>
+      </footer>
+   </body>
+</html>
